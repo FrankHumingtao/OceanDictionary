@@ -27,7 +27,12 @@ Shader "Ocean/OceanURP"
         // 折射
         _MaxDepth ("MaxDepth", Float ) = 1
         _WaterSurfaceDepth ("_WaterSurfaceDepth", Float ) = 1
-    }
+        
+        // 岸边泡沫
+        _Ramprgbtex ("_Ramprgbtex" ,2D ) = "black" {}
+        _FoamRange ("FoamRange", Float ) = 1
+        _FoamTex ("FoamTex",2D) = "black" {}
+    } 
     SubShader
     {
         Tags { 
@@ -67,6 +72,7 @@ Shader "Ocean/OceanURP"
                 float3 positionWS: TEXCOORD1;
                 float4 positionNDC: TEXCOORD2;
                 float4 projPos :TEXCOORD3;
+                float2 uv2: TEXCOORD4;
             };
 
             // compute data
@@ -95,6 +101,11 @@ Shader "Ocean/OceanURP"
             float _MaxDepth;
             float _WaterSurfaceDepth;
 
+            // 岸边泡沫
+            sampler2D _Ramprgbtex; 
+            sampler2D _FoamTex;float4 _FoamTex_ST;
+            float _FoamRange;
+
             //------------[[函数]]--------------
             float4 SSSColor(float3 lightDir, float3 viewDir, float3 normal, float waveHeight, float SSSMask)
             {
@@ -108,6 +119,7 @@ Shader "Ocean/OceanURP"
             Varyings vert(Attributes input){
                 Varyings output;
                 output.uv = TRANSFORM_TEX(input.uv,_Displace);
+                output.uv2 = TRANSFORM_TEX(input.uv,_FoamTex);
                 float4 displace = tex2Dlod(_Displace,float4(output.uv,0,0));
                 input.vertex += float4(displace.xyz,0);
                 VertexPositionInputs positionInputs = GetVertexPositionInputs(input.vertex.xyz);
@@ -147,10 +159,10 @@ Shader "Ocean/OceanURP"
                 // 获取深度
                 real rawDepth = SampleSceneDepth(distUV);
                 
-                // 转换成linear01深度
-                float linear01Depth = Linear01Depth(rawDepth, _ZBufferParams);
-                // 转换成linearEye深度
-                float linearEyeDepth = LinearEyeDepth(rawDepth, _ZBufferParams);
+                // // 转换成linear01深度
+                // float linear01Depth = Linear01Depth(rawDepth, _ZBufferParams);
+                // // 转换成linearEye深度
+                // float linearEyeDepth = LinearEyeDepth(rawDepth, _ZBufferParams);
                 // 获取深度图对应的世界空间坐标
                 float3 depthWSPos  = ComputeWorldSpacePosition(screenUV, rawDepth, UNITY_MATRIX_I_VP);
 
@@ -163,14 +175,20 @@ Shader "Ocean/OceanURP"
                 
                 float waterDepth = length(i.positionWS- depthWSPos);
                 float waterDepth01 =clamp(waterDepth / _MaxDepth, 0, 1);
+                float foamRange =clamp(waterDepth / _FoamRange, 0, 1);
                 
                 // 折射采样
                 float3 refractCol = SampleSceneColor(refractedUV);
 
                 // 添加深度影响
-                float3 reCollege = lerp(refractCol,float3(1,1,1),waterDepth01);
+                refractCol = lerp(refractCol,float3(1,1,1),waterDepth01);
+
+                // 岸边泡沫--------------------------------------------
+                float4 rampfoamCol = tex2D(_Ramprgbtex,float2(1-foamRange,0.5));
+                float4 foamCol = tex2D(_FoamTex,i.uv2+_Time.x*2);
+                float3 finalFoam  = foamCol.r * rampfoamCol.g*1.5+foamCol.g * rampfoamCol.r+  foamCol.b * rampfoamCol.b*0.5;
                 
-                // 通过反射探针获得环境的反射数据
+                // 通过反射探针获得环境的反射数据-------------------------
                 half4 encodedIrradiance = SAMPLE_TEXTURECUBE_LOD(unity_SpecCube0,samplerunity_SpecCube0,reflectDir,0);
                 half3 environment = DecodeHDREnvironment(encodedIrradiance,unity_SpecCube0_HDR);
                 
@@ -199,7 +217,7 @@ Shader "Ocean/OceanURP"
                 alpha  =1;
                 float3 diffuse = lerp(oceanDiffuse, bubblesDiffuse, bubbles);
                 // 这里0.2可以给个参数
-                float3 col = ambient + lerp(diffuse, environment, fresnel)*(reCollege-0.2) +specular+sssColor+rampCol*0.5;
+                float3 col = ambient + lerp(diffuse, environment, fresnel)*(refractCol-0.2) +specular+sssColor+rampCol*0.5+finalFoam;
                 return float4(col,alpha);
             }
 

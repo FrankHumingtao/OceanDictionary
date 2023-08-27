@@ -1,10 +1,14 @@
 fileFormatVersion: 2
-guid: e8a9c9dc51667fa47b1db4d5a680d8a8
+guid: ebd0dacb07e66544594b6c20f2d30ab2
 ShaderImporter:
   externalObjects: {}
-  defaultTextures: []
+  defaultTextures:
+  - _Displace: {instanceID: 0}
+  - _Normal_Bubbles: {instanceID: 0}
+  - _Ramptex: {instanceID: 0}
+  - _SSSMask: {instanceID: 0}
   nonModifiableTextures: []
-  preprocessorOverride: 0
+  preprocessorOverride: 1
   userData: 
   assetBundleName: 
   assetBundleVariant: 
