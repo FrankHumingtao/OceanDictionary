@@ -4,10 +4,14 @@ OceanDictionary是一个关于海洋渲染技术的练习项目，旨在帮助�
 
 ## 项目简介
 
-本项目是一个练习demo，通过使用不同的渲染技术，展示了海洋场景的渲染效果。渲染管线使用的是Unity的URP管线,通过这个项目，你可以学习到以下内容：
+本项目是一个练习demo，通过使用不同的渲染技术，展示了海洋场景的渲染效果。渲染管线使用的是Unity的URP管线,Unity的版本是2021.3.27f1c2.
 
-- FFT海洋[]
-- ...
+![20230906_2351_](https://huspicgo.oss-cn-guangzhou.aliyuncs.com/img/20230906_2351_.png)
+
+## 项目文档
+
+- [水体形态文档](.\Assets\FFTOcean\Documents\水形态部分 .md)
+- [水体着色文档](.\Assets\FFTOcean\Documents\水着色 .md)
 
 ## 如何运行
 
