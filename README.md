@@ -10,8 +10,8 @@ OceanDictionary是一个关于海洋渲染技术的练习项目，旨在帮助�
 
 ## 项目文档
 
-- [水体形态文档](Assets\FFTOcean\Documents\水形态部分 .md)
-- [水体着色文档](Assets\FFTOcean\Documents\水着色 .md)
+- [水体形态文档](https://github.com/FrankHumingtao/OceanDictionary/blob/main/Assets/FFTOcean/Documents/%E6%B0%B4%E5%BD%A2%E6%80%81%E9%83%A8%E5%88%86%20.md)
+- [水体着色文档](https://github.com/FrankHumingtao/OceanDictionary/blob/main/Assets/FFTOcean/Documents/%E6%B0%B4%E7%9D%80%E8%89%B2%20.md)
 
 ## 如何运行
 
